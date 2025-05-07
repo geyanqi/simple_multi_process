@@ -1,5 +1,6 @@
 import os
 
+import torch
 import torch.distributed as dist
 
 
@@ -29,7 +30,9 @@ def setup_distributed_nccl(backend="nccl", port=None):
     rank = int(os.environ["RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
 
-    # gpu_count = torch.cuda.device_count()
+    # for GPU memory balance
+    num_gpus = torch.cuda.device_count()
+    torch.cuda.set_device(rank % num_gpus)
 
     dist.init_process_group(
         backend=backend,
